@@ -25,25 +25,25 @@ def scrape_province(session, province, target=1000, max_pages=50):
 
         try:
             r = session.get(base_url, params=params, headers=HEADERS, timeout=10)
-            r.raise_for_status()  # raises an error on 4xx/5xx (e.g. blocked, rate-limited)
+            r.raise_for_status() 
         except requests.exceptions.RequestException as e:
             print(f"{province} page {page}: request failed -> {e}")
-            break  # stop this province, move on rather than crash whole script
+            break  # stopping for this province only rather than crashing the whole script
 
         soup = BeautifulSoup(r.text, "html.parser")
-        # works for Apartment, House, etc. -- itemtype varies but data-url is always there
-        # we can also get Apartment, House info from here
+
         property_cards = soup.select("article[data-url][itemtype$='Apartment'], article[data-url][itemtype$='House']")
 
+        # if no more listings on this page then stop pagination for this province
         if not property_cards:
-            break  # no more listings on this page -> stop pagination for this province
+            break  
 
         for card in property_cards:
             url = card.get("data-url")
             itemtype = card.get("itemtype")
             type_property = itemtype.rsplit("/", 1)[-1] if itemtype else None
             if url:
-                parsed = parse_listing_url(url)  # extract id, subtype, contract, postal_code, city
+                parsed = parse_listing_url(url)
                 results.append({
                     "province": province,
                     "type_property": type_property,
@@ -57,13 +57,11 @@ def scrape_province(session, province, target=1000, max_pages=50):
             results = results[:target]
             break
 
-        time.sleep(1)  # avoid hammering the server
+        time.sleep(1)
 
     print(f"{province}: collected {len(results)} listings")
     
     return results
-
-
 
 
 def parse_listing_url(url):
@@ -83,7 +81,7 @@ def parse_listing_url(url):
     return {
         "property_id": match.group("property_id"),
         "subtype_property": match.group("subtype"),
-        "type_of_contract": match.group("contract"),        # "for-sale" / "in-public-sale"
+        "type_of_contract": "sale" if "sale" in match.group("contract") else match.group("contract"), # will change this to rent if we do it
         "postal_code": match.group("postal_code"),
         "city": match.group("city"),
     }
