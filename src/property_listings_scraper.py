@@ -33,7 +33,7 @@ def scrape_province(session, province, target=1000, max_pages=50):
         soup = BeautifulSoup(r.text, "html.parser")
         # works for Apartment, House, etc. -- itemtype varies but data-url is always there
         # we can also get Apartment, House info from here
-        property_cards = soup.select("article[data-url]")
+        property_cards = soup.select("article[data-url][itemtype$='Apartment'], article[data-url][itemtype$='House']")
 
         if not property_cards:
             break  # no more listings on this page -> stop pagination for this province
@@ -94,7 +94,7 @@ for prov in provinces:
     all_listings.extend(scrape_province(session, prov))
 
 end_time = time.time()  # end timer
-print(f"The pipeline took {end_time-start_time} minutes")
+print(f"The pipeline took {end_time-start_time} seconds")
 
 # print(all_listings)
 df = pd.DataFrame(all_listings)
