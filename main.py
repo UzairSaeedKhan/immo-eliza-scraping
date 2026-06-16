@@ -15,4 +15,4 @@ property_details = asyncio.run(scrape_all(urls, parse_features, max_concurrent=1
 property_details_df = pl.DataFrame(property_details)
 
 joined_df = join_two_dfs_by_property_id(property_listings_df, property_details_df)
-joined_df.write_csv("./data/scraped_properties.csv")
+save_to_csv(joined_df, "./data/scraped_properties.csv")
