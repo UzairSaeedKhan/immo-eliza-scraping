@@ -5,11 +5,7 @@ import json
 url = "https://immovlan.be/en/detail/residence/for-sale/6040/jumet/vbe35169"
 
 #Global function contains all the functions related to scraping data
-def scrape_features(url):
-
-    html = requests.get(url, headers={"User-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"}).text
-
-
+def parse_features(html):
     soup = BeautifulSoup(html, "html.parser")
 
 
@@ -212,7 +208,9 @@ def scrape_features(url):
                     return p.get_text(strip=True) if p else None
 
         return None
-
+    
+    #Property id
+    property_id = soup.find("span", class_ = "vlancode").get_text(strip=True)
 
     #Results
     Tags = {
