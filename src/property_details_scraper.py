@@ -1,91 +1,141 @@
-
 import requests, re
 from bs4 import BeautifulSoup
+import json
 
-url = "https://immovlan.be/en/detail/duplex/for-sale/1000/brussels/vbe35095"
-html = requests.get(url, headers={"User-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"}).text
+#url = "https://immovlan.be/en/detail/apartment/for-sale/2390/oostmalle/rbw20430"
 
-#def scrape_features(url):
-soup = BeautifulSoup(html, "html.parser")
+#Global function contains all the functions related to scraping data
+def scrape_features(url):
+
+    html = requests.get(url, headers={"User-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"}).text
 
 
-def text_of(tag):
-#Return stripped text of a tag, or None if the tag wasn't found.
-#Avoids 'NoneType has no attribute get_text' crashes."""
-   return tag.get_text(strip=True) if tag else None
-def value_after_h4(label):
-    h4 = soup.find("h4", string=lambda x: x and label.lower() in x.lower())
-    if not h4:
-        return None
-    block = h4.find_parent()
+    soup = BeautifulSoup(html, "html.parser")
 
-    # récupère tous les textes du bloc
-    texts = block.stripped_strings
 
-    # saute le label, garde la valeur
-    next(texts, None)
-    value = next(texts, None)
+    #Take the value after h4 in the HTML file (the <p> block)    
+    def value_after_h4(label):
+        h4 = soup.find("h4", string=lambda x: x and label.lower() in x.lower())
+        if not h4:
+            return None
+        block = h4.find_parent()
 
-    return value
-    #h4 = soup.find("h4", string=label)
+        # retrieves all the text in the block
+        texts = block.stripped_strings
 
-    #return text_of(h4.find_next("p")) if h4 else None
-#def binary_element(label):
+        # only keeps the value
+        next(texts, None)
+        value = next(texts, None)
 
-    #blocks = soup.find_all("div")
+        return value
 
-    #value = value_after_h4(label)
 
-    #if value in ["yes", "true"]:
-     #   return 1
-    #elif value in ["no", "false"]:
-     #   return 0
-    #else:
-     #   return None
+    #converts "Yes" in 1 and "No" in 0 (None if no infos)
+    def binary_element(label):    
+        
+        value = value_after_h4(label)
 
-    #return None
+        #infos in h4 blocks
+        if value:
+            value = value.lower().strip()
 
-def binary_element(label):
-
-    label = label.lower()
-
-    for tag in soup.find_all(string=True):
-
-        if tag and label in tag.lower():
-
-            parent_text = tag.parent.get_text(" ", strip=True).lower()
-
-            if "yes" in parent_text:
+            if value == "yes":
                 return 1
-            if "no" in parent_text:
+            if value == "no":
                 return 0
 
-    return None
-price_raw = soup.find("span", class_="detail__header_price_data")
+        #infos in other blocks than h4 (ex: <strong>)
+        for tag in soup.find_all(string=True):
+
+            if label.lower() in tag.lower():
+
+                text = tag.parent.parent.get_text(" ", strip=True).lower()
+
+                if "yes" in text:
+                    return 1
+                if "no" in text:
+                    return 0
+
+        return "0"
 
 
-if price_raw:
-    price = price_raw.get_text(strip=True)
-    price = price.replace("\u202f", " ")
-else:
-    price = None
-Tags = {
-#list of caracteristics
-    "price_tag" : price,
-    #"property_id_tag" : text_of(soup.find("span", class_="vlancode")),
-    #"postal_code_tag" : text_of(soup.find("span", class_="city-line")),
-# use a CSS selector so multi-class elements match regardless of class order
-    "livable_surface_tag" : value_after_h4("Surface"),
-    "construction_year_tag" : value_after_h4("Build Year"),
-    "number_of_bedrooms" : value_after_h4("Number of bedrooms"),
-    "number_of_bathrooms" : value_after_h4("Number of bathrooms"),
-    "number_of_toilets" : value_after_h4("Number of toilets"),
-    "VAT_included" : binary_element("VAT"),
-    "terrace_included" : binary_element("Terrace"),
-    "Elevator_included" : binary_element("Ascenseur"),
-    "Garden" : value_after_h4("Garden")
-}
-print(Tags)
-  
+    #EPC score storing
+    meta_desc = soup.find("meta", attrs={"name": "description"})
+
+    epc = None
+
+    if meta_desc:
+        description = meta_desc.get("content", "")
+
+        match = re.search(r"EPC\s+([A-G]\+?)", description)
+
+        if match:
+            epc = match.group(1)
 
 
+    #To store and clean the price
+    price_raw = soup.find("span", class_="detail__header_price_data")
+
+    if price_raw:
+        price = price_raw.get_text(strip=True)
+        price = price.replace("\u202f", " ")
+    else:
+        price = None
+
+
+    #Train station distance storing
+    def get_train_distance(mode):
+        blocks = soup.find_all("div", class_="data-row")
+
+        for block in blocks:
+
+            h3 = block.find("h3")
+
+            if not h3:
+                continue
+
+            if "Train stations" not in h3.get_text(" ", strip=True):
+                continue
+
+            spans = block.find_all("span", title=mode)
+
+            if spans:
+                # on prend le premier span du bloc Train stations
+                return spans[0].get_text(" ", strip=True)
+
+        return None
+
+
+    #Results
+    Tags = {
+    
+        "Price" : price,
+        "VAT_included" : binary_element("VAT"),
+        
+        "State of property" : value_after_h4("State of property"),
+        "Livable Surface" : value_after_h4("Surface"),
+        "Construction year" : value_after_h4("Build Year"),
+        "EPC_score" : epc,
+        
+        "Nb of facades" : value_after_h4("Number of facades"),
+        "Nb of floors" : value_after_h4("Number of floors"),
+        "Nb of bedrooms" : value_after_h4("Number of bedrooms"),
+        "Nb of bathrooms" : value_after_h4("Number of bathrooms"),
+        "Nb of showers" : value_after_h4("Number of showers"),
+        "Nb of toilets" : value_after_h4("Number of toilets"),
+        
+        "Terrace" : binary_element("Terrace"),
+        "Elevator" : binary_element("Elevator"),
+        "Access for disabled" : binary_element("Access for disabled"),
+        "Garden" : binary_element("Garden"),
+        "Garage included" : binary_element("Garage"), 
+        "Swimming pool" : binary_element("Swimming pool"), 
+        
+        "Distance from train stations by foot": get_train_distance("Walking"),
+        "Distance from train stations by car": get_train_distance("Driving")}
+    
+
+    for key, value in Tags.items():
+        print(f"- {key}: {value}")
+
+scrape_features(url)
