@@ -1,29 +1,18 @@
 from src.property_listings_scraper import scrape_all_provinces
-from src.utils import save_to_csv
-import requests
-import time
-import pandas as pd
+from src.utils import save_to_csv, join_two_dfs_by_property_id
 from src.property_details_scraper import parse_features
 from src.async_utils import scrape_all
 import asyncio
-
-"""
-session = requests.Session()
-base_url = "https://immovlan.be/en/real-estate"
-common_params = {
-    "transactiontypes": "for-sale,in-public-sale",
-    "propertytypes": "house,apartment"
-}
-HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+import polars as pl
 
 all_province_listings = scrape_all_provinces()
 save_to_csv(all_province_listings, "./data/property_listings.csv")
-"""
 
-df = pd.read_csv("./data/property_listings.csv")
-urls = df["property_url"].tolist()[:100]
+property_listings_df = pl.read_csv("./data/property_listings.csv")
+urls = property_listings_df["property_url"].to_list()
 
-results = asyncio.run(scrape_all(urls, parse_features, max_concurrent=10))
+property_details = asyncio.run(scrape_all(urls, parse_features, max_concurrent=10))
+property_details_df = pl.DataFrame(property_details)
 
-for i, r in enumerate(results):
-    print(f"[{i+1}/{len(results)}]", r)
+joined_df = join_two_dfs_by_property_id(property_listings_df, property_details_df)
+joined_df.write_csv("./data/scraped_properties.csv")
