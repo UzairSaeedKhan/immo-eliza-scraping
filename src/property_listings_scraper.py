@@ -18,7 +18,7 @@ provinces = [
     "luxembourg",
 ]
 
-def scrape_province(session, province, target=1000, max_pages=50):
+def scrape_listings_by_province(session, province, target=1000, max_pages=50):
     results = []
     for page in range(1, max_pages + 1):
         params = {**common_params, "provinces": province, "page": page}
@@ -89,7 +89,7 @@ def parse_listing_url(url):
 start_time = time.time()  # start timer
 all_listings = []
 for prov in provinces:
-    all_listings.extend(scrape_province(session, prov))
+    all_listings.extend(scrape_listings_by_province(session, prov))
 
 end_time = time.time()  # end timer
 print(f"The pipeline took {end_time-start_time} seconds")
