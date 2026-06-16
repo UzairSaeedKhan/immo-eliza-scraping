@@ -11,14 +11,7 @@ common_params = {
 }
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
 
-provinces = [
-    "brussels", "vlaams-brabant", "antwerpen", "east-flanders",
-    "west-flanders", "limburg", "hainaut",
-    "namur", "liege", 
-    "luxembourg",
-]
-
-def scrape_listings_by_province(session, province, target=1000, max_pages=50):
+def scrape_listings_by_province(session, province, target=1000, max_pages=50) -> list:
     results = []
     for page in range(1, max_pages + 1):
         params = {**common_params, "provinces": province, "page": page}
@@ -86,14 +79,15 @@ def parse_listing_url(url):
         "city": match.group("city"),
     }
 
-start_time = time.time()  # start timer
-all_listings = []
-for prov in provinces:
-    all_listings.extend(scrape_listings_by_province(session, prov))
-
-end_time = time.time()  # end timer
-print(f"The pipeline took {end_time-start_time} seconds")
-
-# print(all_listings)
-df = pd.DataFrame(all_listings)
-df.to_csv("./../data/property_listings.csv", index=False)
+def scrape_all_provinces() -> pd.DataFrame:
+    provinces = [
+    "brussels", "vlaams-brabant", "antwerpen", "east-flanders", "west-flanders",
+    "brabant-wallon", "limburg", "hainaut", "namur", "liege", "luxembourg" 
+    ]
+    all_listings = []
+    start_time = time.time()
+    for prov in provinces:
+        all_listings.extend(scrape_listings_by_province(session, prov))
+    end_time = time.time()
+    print(f"The scrape_all_provinces pipeline took {(end_time-start_time)/60} minutes")
+    return pd.DataFrame(all_listings)
