@@ -51,3 +51,6 @@ async def scrape_all(urls, parse_function, max_concurrent = 5):
 
     # Filter out any None values from failed pages
     return [r for r in results if r is not None]
+
+def save_to_csv(df, path):
+    df.to_csv(path, index=False)

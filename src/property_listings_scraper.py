@@ -91,6 +91,3 @@ def scrape_all_provinces() -> pd.DataFrame:
     end_time = time.time()
     print(f"The scrape_all_provinces pipeline took {(end_time-start_time)/60} minutes")
     return pd.DataFrame(all_listings)
-
-def save_to_csv(df, path):
-    df.to_csv(path, index=False)
