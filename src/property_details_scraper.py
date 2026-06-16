@@ -1,6 +1,5 @@
 import requests, re
 from bs4 import BeautifulSoup
-import json
 
 url = "https://immovlan.be/en/detail/apartment/for-sale/2390/oostmalle/rbw20430"
 
@@ -106,35 +105,35 @@ def scrape_features(url):
         return None
     
     #Property id
-    property = soup.find("span", class_ = "vlancode").get_text(strip=True)
+    property_id = soup.find("span", class_ = "vlancode").get_text(strip=True)
 
     #Results
     Tags = {
-        "Property id" : property,
-        "Price" : price,
-        "VAT_included" : binary_element("VAT"),
+        "property_id" : property_id,
+        "price" : price,
+        "vat_included" : binary_element("VAT"),
         
-        "State of property" : value_after_h4("State of property"),
-        "Livable Surface" : value_after_h4("Surface"),
-        "Construction year" : value_after_h4("Build Year"),
-        "EPC_score" : epc,
+        "state_of_property" : value_after_h4("State of property"),
+        "livable_surface" : value_after_h4("Surface"),
+        "construction_year" : value_after_h4("Build Year"),
+        "epc_score" : epc,
         
-        "Nb of facades" : value_after_h4("Number of facades"),
-        "Nb of floors" : value_after_h4("Number of floors"),
-        "Nb of bedrooms" : value_after_h4("Number of bedrooms"),
-        "Nb of bathrooms" : value_after_h4("Number of bathrooms"),
-        "Nb of showers" : value_after_h4("Number of showers"),
-        "Nb of toilets" : value_after_h4("Number of toilets"),
+        "nb_of_facades" : value_after_h4("Number of facades"),
+        "nb_of_floors" : value_after_h4("Number of floors"),
+        "nb_of_bedrooms" : value_after_h4("Number of bedrooms"),
+        "nb_of_bathrooms" : value_after_h4("Number of bathrooms"),
+        "nb_of_showers" : value_after_h4("Number of showers"),
+        "nb_of_toilets" : value_after_h4("Number of toilets"),
         
-        "Terrace" : binary_element("Terrace"),
-        "Elevator" : binary_element("Elevator"),
-        "Access for disabled" : binary_element("Access for disabled"),
-        "Garden" : binary_element("Garden"),
-        "Garage included" : binary_element("Garage"), 
-        "Swimming pool" : binary_element("Swimming pool"), 
+        "terrace" : binary_element("Terrace"),
+        "elevator" : binary_element("Elevator"),
+        "access_for_disabled" : binary_element("Access for disabled"),
+        "garden" : binary_element("Garden"),
+        "garage" : binary_element("Garage"), 
+        "swimming_pool" : binary_element("Swimming pool"), 
         
-        "Distance from train stations by foot": get_train_distance("Walking"),
-        "Distance from train stations by car": get_train_distance("Driving")}
+        "distance_from_train_stations_by_foot": get_train_distance("Walking"),
+        "distance_from_train_stations_by_car": get_train_distance("Driving")}
     
 
     for key, value in Tags.items():
