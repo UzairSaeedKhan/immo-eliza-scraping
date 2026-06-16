@@ -1,6 +1,7 @@
 import requests, time, re
 from bs4 import BeautifulSoup
 import pandas as pd
+import polars as pl
 import time, re
 
 session = requests.Session()
@@ -90,4 +91,4 @@ def scrape_all_provinces() -> pd.DataFrame:
         all_listings.extend(scrape_listings_by_province(session, prov))
     end_time = time.time()
     print(f"The scrape_all_provinces pipeline took {(end_time-start_time)/60} minutes")
-    return pd.DataFrame(all_listings)
+    return pl.DataFrame(all_listings)
