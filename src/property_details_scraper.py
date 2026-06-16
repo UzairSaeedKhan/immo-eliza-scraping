@@ -2,7 +2,7 @@ import requests, re
 from bs4 import BeautifulSoup
 import json
 
-#url = "https://immovlan.be/en/detail/apartment/for-sale/2390/oostmalle/rbw20430"
+url = "https://immovlan.be/en/detail/apartment/for-sale/2390/oostmalle/rbw20430"
 
 #Global function contains all the functions related to scraping data
 def scrape_features(url):
@@ -104,11 +104,13 @@ def scrape_features(url):
                 return spans[0].get_text(" ", strip=True)
 
         return None
-
+    
+    #Property id
+    property = soup.find("span", class_ = "vlancode").get_text(strip=True)
 
     #Results
     Tags = {
-    
+        "Property id" : property,
         "Price" : price,
         "VAT_included" : binary_element("VAT"),
         
