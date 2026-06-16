@@ -1,16 +1,9 @@
 import requests, re
 from bs4 import BeautifulSoup
 
-url = "https://immovlan.be/en/detail/apartment/for-sale/2390/oostmalle/rbw20430"
-
 #Global function contains all the functions related to scraping data
-def scrape_features(url):
-
-    html = requests.get(url, headers={"User-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"}).text
-
-
+def parse_features(html):
     soup = BeautifulSoup(html, "html.parser")
-
 
     #Take the value after h4 in the HTML file (the <p> block)    
     def value_after_h4(label):
@@ -108,7 +101,7 @@ def scrape_features(url):
     property_id = soup.find("span", class_ = "vlancode").get_text(strip=True)
 
     #Results
-    Tags = {
+    tags = {
         "property_id" : property_id,
         "price" : price,
         "vat_included" : binary_element("VAT"),
@@ -135,8 +128,4 @@ def scrape_features(url):
         "distance_from_train_stations_by_foot": get_train_distance("Walking"),
         "distance_from_train_stations_by_car": get_train_distance("Driving")}
     
-
-    for key, value in Tags.items():
-        print(f"- {key}: {value}")
-
-scrape_features(url)
+    return tags
