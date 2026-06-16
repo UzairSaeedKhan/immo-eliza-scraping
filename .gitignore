@@ -1,6 +1,9 @@
 *.ipynb
 output/
 settings.json
+.vscode/
+.vscode
+dev/
 
 
 # Byte-compiled / optimized / DLL files
