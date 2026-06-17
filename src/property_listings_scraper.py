@@ -25,10 +25,11 @@ async def scrape_listings_by_province(client, semaphore, province, target=1000, 
 
         soup = BeautifulSoup(r.text, "html.parser")
 
+        all_cards = soup.select("article[data-url]")
         property_cards = soup.select("article[data-url][itemtype$='Apartment'], article[data-url][itemtype$='House']")
 
         # if no more listings on this page then stop pagination for this province
-        if not property_cards:
+        if not all_cards:
             break  
 
         for card in property_cards:
