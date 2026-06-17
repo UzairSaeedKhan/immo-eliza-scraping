@@ -20,103 +20,146 @@ def parse_features(url):
 
     soup = BeautifulSoup(html, "html.parser")
 
+#--------------------------------------------------------------------------------------------------------    
     #Take the value after h4 in the HTML file (the <p> block)
     def value_after_h4(label):
-        h4 = soup.find("h4", string=lambda x: x and label.lower() in x.lower())
+        """
+        Extracts the value associated with a given <h4> label
+        Example:
+        # <h4>Number of bedrooms</h4>
+        # <p>3</p>
+        # returns -> 3
+        """
+        #Convert once to avoid repeated lower() calls
+        label = label.lower() #improvement: call label.lower() earlier (improve the carbone emission apparently)
+
+        #Find the matching h4 element
+        h4 = soup.find("h4", string=lambda x: x and label in x.lower())
 
         if not h4:
             return None
 
-        block = h4.find_parent()
+        #Get the parent block containing both the label and its value
+        block = h4.parent #improvement : removing "find.parent()" to know go through more element than necessary
 
+        #Retrieve all non-empty text elements from the block
         texts = block.stripped_strings
 
+        #Skip the label itself
         next(texts, None)
+
+        #Get the value located after the label
         value = next(texts, None)
 
         if not value:
             return None
 
+        #Remove unit if present
         value = value.replace("m²", "").strip()
 
-        # conversion seulement si c'est un nombre
+        #Convert numeric values to integers
         if value.replace(".", "", 1).isdigit():
-
-            if "." in value:
-                return int(value)
-
-            return int(value)
+            return int(float(value)) #improvement
+            
+        #Return text values unchanged
         return value    
     
+#--------------------------------------------------------------------------------------------------------    
     def get_property_info(section_title, field_name):
+        """
+        Extract a specific field value from a given property section
+        on the Immovlan webpage.
 
-            blocks = soup.find_all("div", class_="data-row")
+        The function searches inside structured "data-row" blocks,
+        identifies the correct section via its <h3> title, then retrieves
+        the corresponding field value from <h4> / <p> pairs.
 
-            for block in blocks:
+        Returns:
+            str or None: The extracted value if found, otherwise None.
+        """
 
-                h3 = block.find("h3")
+        #Convert search strings once to avoid repeated lower() calls
+        section_title = section_title.lower()
+        field_name = field_name.lower()
 
-                if not h3:
-                    continue
+        #Browse all information sections of the property page
+        for block in soup.find_all("div", class_="data-row"): #improvement: removing blocks
 
-                if section_title.lower() not in h3.get_text(" ", strip=True).lower():
-                    continue
+            h3 = block.find("h3")
 
-                items = block.find_all("div")
+            #Skip blocks without a section title
+            if not h3:
+                continue
 
-                for item in items:
+            # Check if this is the section we are looking for
+            if section_title.lower() not in h3.get_text(" ", strip=True).lower():
+                continue
+            
+            #Search inside the matching section
+            for item in block.find_all("div"): #improvement: removing items
 
-                    h4 = item.find("h4")
-                    p = item.find("p")
+                
+                h4 = item.find("h4")
+                p = item.find("p")
 
-                    if h4 and field_name.lower() in h4.get_text(strip=True).lower():
-                        return p.get_text(strip=True) if p else None
+                #If the field matches, return its associated value
+                if h4 and field_name.lower() in h4.get_text(strip=True).lower():
+                    return p.get_text(strip=True) if p else None
+                
+        #Information not found
+        return None
 
-            return None
-
-    #converts "Yes" in 1 and "No" in 0 (None if no infos)
-    
+#--------------------------------------------------------------------------------------------------------    
+   
     def binary_element(label):    
-        
+        """
+        Extract a binary feature from the property page.
+
+        The function tries to convert textual property features into:
+        - 1 = Yes
+        - 0 = No
+        - None = information not available
+
+        It supports two possible HTML patterns:
+        1. Structured <h4> blocks (preferred source)
+        2. Fallback <strong> tags in unstructured text
+        """
+
+        #Try to extract value from standard <h4> structure
         value = value_after_h4(label)
 
-        #infos in h4 blocks
         if value:
             value = value.lower().strip()
-            
 
             if value.startswith("yes"):
                 return 1
             if value.startswith("no"):
                 return 0
+        #improvement : removing the strong part
 
-            #if value == "yes":
-             #   return 1
-            #if value == "no":
-             #   return 0
-
-        #infos in other blocks than h4 (ex: <strong>)
-        for strong in soup.find_all("strong"):
-
-            if label.lower() in strong.get_text(strip=True).lower():
-
-                parent_text = strong.parent.get_text(" ", strip=True).lower()
-
-                if "yes" in parent_text:
-                    return 1
-
-                if "no" in parent_text:
-                    return 0
-
+        #No information found
         return None
-    
-    def binary_vat_reader(label):
+#--------------------------------------------------------------------------------------------------------    
 
+    def binary_vat_reader(label):
+        """
+        Extract VAT-related binary information from the HTML.
+
+        Returns:
+            1 if VAT is mentioned as "yes"
+            0 if VAT is mentioned as "no"
+            None if no information is found
+        """
+        #Normalize label once (avoid repeated .lower() calls inside loop)
+        label = label.lower()
+
+        #Iterate over all <strong> tags (possible key-value indicators in the page)
         for strong in soup.find_all("strong"):
 
             strong_text = strong.get_text(strip=True).lower()
 
-            if label.lower() in strong_text:
+            #Check if this <strong> corresponds to the VAT label
+            if label in strong_text:
 
                 text = strong.parent.get_text(" ", strip=True).lower()
 
@@ -129,49 +172,45 @@ def parse_features(url):
         return None
     
    
+#--------------------------------------------------------------------------------------------------------    
 
-
-    #EPC score storing
+    # Extract EPC rating from the page meta description
+    # Example format: "EPC A, some other text..."
     meta_desc = soup.find("meta", attrs={"name": "description"})
 
     epc = None
 
     if meta_desc:
+        #Get meta description content safely
         description = meta_desc.get("content", "")
 
+        #Search for EPC pattern (A-G or A+ style rating)
         match = re.search(r"EPC\s+([A-G]\+?)", description)
 
+        #Extract EPC value if pattern is found
         if match:
             epc = match.group(1)
 
-    """
-    #To store and clean the price
+#--------------------------------------------------------------------------------------------------------    
+    #Extract property price from HTML and clean it into a numeric value
     price_raw = soup.find("span", class_="detail__header_price_data")
 
-    if price_raw:
-        price = price_raw.get_text(strip=True)
-        price = price.replace("\u202f", "")
-        price = price.replace("€", "")
-        price = int(price.strip())
+    price = None #improvement
 
-    else:
-        price = None
-    """
-    price_raw = soup.find("span", class_="detail__header_price_data")
+    if price_raw: #improvement
+        #Get raw price and remove spaces/€ symbols in one step
+        raw_text = price_raw.get_text(strip=True)
 
-    if price_raw:
-        price = price_raw.get_text(strip=True)
+        #Keep only digits (remove currency symbols, spaces, etc.)
+        digits = "".join(c for c in raw_text if c.isdigit())
 
-        # garde uniquement les chiffres
-        price = "".join(c for c in price if c.isdigit())
-
-        price = float(price) if price else None
-
-    else:
-        price = None
+        #Convert to float if valid, otherwise keep None
+        price = float(digits) if digits else None
 
 
-    #Train station distance storing
+
+#--------------------------------------------------------------------------------------------------------    
+
     def get_distance(category, mode):
         for block in soup.find_all("div", class_="data-row"):
 
@@ -193,7 +232,8 @@ def parse_features(url):
 
         return None
     
-    
+  #--------------------------------------------------------------------------------------------------------    
+  
     def get_latitude():
         for script in soup.find_all("script"):
             try:
@@ -208,7 +248,9 @@ def parse_features(url):
                 continue
 
         return None
-    
+
+#--------------------------------------------------------------------------------------------------------    
+
     def get_longitude():
         for script in soup.find_all("script"):
             try:
@@ -224,33 +266,13 @@ def parse_features(url):
 
         return None
     
-    def get_flooding():
-        blocks = soup.find_all("div", class_="data-row")
-
-        for block in blocks:
-
-            h3 = block.find("h3")
-
-            if not h3:
-                continue
-
-            if "Town planning and environmental risks" not in h3.get_text(" ", strip=True):
-                continue
-
-            items = block.find_all("div")
-
-            for item in items:
-                h4 = item.find("h4")
-                p = item.find("p")
-
-                if h4 and "flooding area type" in h4.get_text(strip=True).lower():
-                    return p.get_text(strip=True) if p else None
-
-        return None
+ #--------------------------------------------------------------------------------------------------------    
+   
     
     #Property id
     property_id = soup.find("span", class_ = "vlancode").get_text(strip=True)
 
+#--------------------------------------------------------------------------------------------------------    
 
     #Results
     Tags = {
@@ -261,7 +283,7 @@ def parse_features(url):
         "state_of_property" : get_property_info("General info", "State of the property"),
         "heating_type" : get_property_info("Heating and energy","Type of heating"),
         "sun_exposure" : get_property_info("Outdoor description","Orientation of the front facade"),
-        "livable_surface" : value_after_h4("Surface"),
+        "livable_surface_in_m²" : value_after_h4("Surface"),
         "construction_year" : value_after_h4("Build Year"),
         "epc_score" : epc,
 
@@ -287,8 +309,7 @@ def parse_features(url):
         "cellar" : binary_element("Cellar"), 
         "attic" : binary_element("Attic"),
 
-        "flooding_area_type" : get_flooding(),
-        
+        "flooding_area_type" : get_property_info("Town planning and environmental risks", "flooding area type"),
         
         "distance_from_train_stations_by_foot_in_m": get_distance("Train stations", "Walking"),
         "distance_from_train_stations_by_car_in_m": get_distance("Train stations", "Driving"),
@@ -315,3 +336,4 @@ def parse_features(url):
         print(f"- {key}: {value if value is not None else 'None'}, {type(value)}")
         
 parse_features(url)
+
