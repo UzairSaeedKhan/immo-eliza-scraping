@@ -1,6 +1,7 @@
 import asyncio
 import httpx
 import logging
+import time
 
 logging.basicConfig(
     level=logging.INFO,
@@ -58,6 +59,7 @@ async def scrape_all(urls, parse_function, max_concurrent=10):
     total = len(urls)
     logger.info(f"Starting scrape: {total} URLs, max {max_concurrent} concurrent")
 
+    start_time = time.monotonic()
     semaphore = asyncio.Semaphore(max_concurrent)
     completed = 0
 
@@ -75,5 +77,6 @@ async def scrape_all(urls, parse_function, max_concurrent=10):
 
     successful = [r for r in results if r is not None]
     failed = total - len(successful)
-    logger.info(f"Done: {len(successful)} succeeded, {failed} failed out of {total}")
+    total_time = time.monotonic() - start_time
+    logger.info(f"Done: {len(successful)} succeeded, {failed} failed out of {total} in {total_time:.2f}s")
     return successful
