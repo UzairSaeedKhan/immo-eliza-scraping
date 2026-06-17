@@ -5,10 +5,10 @@ from src.async_utils import scrape_all
 import asyncio
 import polars as pl
 
-all_province_listings = scrape_all_provinces()
-save_to_csv(all_province_listings, "./data/property_listings.csv")
+property_listings_df = asyncio.run(scrape_all_provinces())
+save_to_csv(property_listings_df, "./data/property_listings.csv")
 
-property_listings_df = pl.read_csv("./data/property_listings.csv")
+# property_listings_df = pl.read_csv("./data/property_listings.csv")
 urls = property_listings_df["property_url"].to_list()
 
 property_details = asyncio.run(scrape_all(urls, parse_features, max_concurrent=10))
