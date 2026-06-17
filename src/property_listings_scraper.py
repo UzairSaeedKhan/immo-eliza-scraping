@@ -1,10 +1,9 @@
-import requests, time, re
+import asyncio, httpx, time, re
 from bs4 import BeautifulSoup
 import pandas as pd
 import polars as pl
 import time, re
 
-session = requests.Session()
 base_url = "https://immovlan.be/en/real-estate"
 common_params = {
     "transactiontypes": "for-sale,in-public-sale",
@@ -12,15 +11,16 @@ common_params = {
 }
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
 
-def scrape_listings_by_province(session, province, target=1000, max_pages=50) -> list:
+async def scrape_listings_by_province(client, semaphore, province, target=1000, max_pages=50) -> list:
     results = []
     for page in range(1, max_pages + 1):
         params = {**common_params, "provinces": province, "page": page}
 
         try:
-            r = session.get(base_url, params=params, headers=HEADERS, timeout=10)
+            async with semaphore:
+                r = await client.get(base_url, params=params, headers=HEADERS, timeout=10)
             r.raise_for_status() 
-        except requests.exceptions.RequestException as e:
+        except httpx.RequestError as e:
             print(f"{province} page {page}: request failed -> {e}")
             break  # stopping for this province only rather than crashing the whole script
 
@@ -51,7 +51,7 @@ def scrape_listings_by_province(session, province, target=1000, max_pages=50) ->
             results = results[:target]
             break
 
-        time.sleep(1)
+        await asyncio.sleep(1)
 
     print(f"{province}: collected {len(results)} listings")
     
@@ -80,15 +80,16 @@ def parse_listing_url(url):
         "city": match.group("city"),
     }
 
-def scrape_all_provinces() -> pd.DataFrame:
+async def scrape_all_provinces() -> pd.DataFrame:
     provinces = [
-    "brussels", "vlaams-brabant", "antwerpen", "east-flanders", "west-flanders",
+    "brussels", "vlaams-brabant", "antwerp", "east-flanders", "west-flanders",
     "brabant-wallon", "limburg", "hainaut", "namur", "liege", "luxembourg" 
     ]
-    all_listings = []
+    semaphore = asyncio.Semaphore(10)
     start_time = time.time()
-    for prov in provinces:
-        all_listings.extend(scrape_listings_by_province(session, prov))
+    async with httpx.AsyncClient(headers = HEADERS) as client:
+        tasks = [scrape_listings_by_province(client, semaphore, prov) for prov in provinces]
+        results = await asyncio.gather(*tasks) 
     end_time = time.time()
     print(f"The scrape_all_provinces pipeline took {(end_time-start_time)/60} minutes")
-    return pl.DataFrame(all_listings)
+    return pl.DataFrame([listing for prov_results in results for listing in prov_results])
