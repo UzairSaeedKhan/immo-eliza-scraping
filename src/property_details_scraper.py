@@ -212,12 +212,26 @@ def parse_features(url):
 #--------------------------------------------------------------------------------------------------------    
 
     def get_distance(category, mode):
+        """
+        Extract distance information for a given category (e.g. Train stations)
+        and transport mode (e.g. Walking, Driving).
+
+        Returns:
+            Distance in meters as float if found,
+            otherwise None.
+        """
+        
+
+        #Loop through all property sections
         for block in soup.find_all("div", class_="data-row"):
 
+            #Extract section title (e.g. "Train stations", "Bus", etc.)
             h3 = block.find("h3")
 
+            #Match category
             if h3 and category in h3.get_text():
 
+                #Find the distance element for the requested mode
                 span = block.find("span", title=mode)
 
                 if span:
@@ -225,6 +239,7 @@ def parse_features(url):
 
                     distance = float(parts[0])
 
+                    #Convert kilometers to meters if needed
                     if parts[1] == "km":
                         distance *= 1000
 
@@ -235,16 +250,26 @@ def parse_features(url):
   #--------------------------------------------------------------------------------------------------------    
   
     def get_latitude():
+        """
+        Extract latitude value from embedded JSON scripts in the HTML.
+
+        Returns:
+            float latitude if found, otherwise None
+        """
+        #Loop through all <script> tags in the page
         for script in soup.find_all("script"):
+            
             try:
+                #Try to parse JSON content inside script
                 data = json.loads(script.string)
 
+                #Extract latitude if available
                 lat = data["latitude"]
                 
-
                 return float(lat)
 
             except:
+                #Ignore scripts that are not valid JSON or missing keys
                 continue
 
         return None
@@ -252,6 +277,12 @@ def parse_features(url):
 #--------------------------------------------------------------------------------------------------------    
 
     def get_longitude():
+        """
+        Extract longitude value from embedded JSON scripts in the HTML.
+
+        Returns:
+            float longitude if found, otherwise None
+        """
         for script in soup.find_all("script"):
             try:
                 data = json.loads(script.string)
@@ -267,9 +298,8 @@ def parse_features(url):
         return None
     
  #--------------------------------------------------------------------------------------------------------    
-   
-    
-    #Property id
+    # Extract the unique property identifier (vlancode) from the HTML page
+    # This ID is used to uniquely reference the property listing
     property_id = soup.find("span", class_ = "vlancode").get_text(strip=True)
 
 #--------------------------------------------------------------------------------------------------------    
