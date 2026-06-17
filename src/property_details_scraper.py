@@ -5,7 +5,7 @@ import requests #API part
 import math
 
 #url = "https://immovlan.be/en/detail/residence/for-sale/6040/jumet/vbe35169"
-url = "https://immovlan.be/en/detail/residence/for-sale/1150/sint-pieters-woluwe/vbe35189"
+url = "https://immovlan.be/en/detail/apartment/for-sale/3020/herent/rbw18421"
 #url = "https://immovlan.be/en/detail/residence/for-sale/3550/heusden-zolder/rbw24745"
 #url ="https://immovlan.be/en/detail/student-flat/for-sale/3000/leuven/rbw24627"
 
@@ -43,34 +43,36 @@ def parse_features(url):
         if value.replace(".", "", 1).isdigit():
 
             if "." in value:
-                return float(value)
+                return int(value)
 
-            return float(value)
+            return int(value)
         return value    
     
-    def get_state_of_property():
-        blocks = soup.find_all("div", class_="data-row")
+    def get_property_info(section_title, field_name):
 
-        for block in blocks:
+            blocks = soup.find_all("div", class_="data-row")
 
-            h3 = block.find("h3")
+            for block in blocks:
 
-            if not h3:
-                continue
+                h3 = block.find("h3")
 
-            if "General info" not in h3.get_text(" ", strip=True):
-                continue
+                if not h3:
+                    continue
 
-            items = block.find_all("div")
+                if section_title.lower() not in h3.get_text(" ", strip=True).lower():
+                    continue
 
-            for item in items:
-                h4 = item.find("h4")
-                p = item.find("p")
+                items = block.find_all("div")
 
-                if h4 and "state of the property" in h4.get_text(strip=True).lower():
-                    return p.get_text(strip=True) if p else None
+                for item in items:
 
-        return None
+                    h4 = item.find("h4")
+                    p = item.find("p")
+
+                    if h4 and field_name.lower() in h4.get_text(strip=True).lower():
+                        return p.get_text(strip=True) if p else None
+
+            return None
 
     #converts "Yes" in 1 and "No" in 0 (None if no infos)
     
@@ -81,25 +83,51 @@ def parse_features(url):
         #infos in h4 blocks
         if value:
             value = value.lower().strip()
+            
 
-            if value == "yes":
+            if value.startswith("yes"):
                 return 1
-            if value == "no":
+            if value.startswith("no"):
                 return 0
 
+            #if value == "yes":
+             #   return 1
+            #if value == "no":
+             #   return 0
+
         #infos in other blocks than h4 (ex: <strong>)
-        for tag in soup.find_all(string=True):
+        for strong in soup.find_all("strong"):
 
-            if label.lower() in tag.lower():
+            if label.lower() in strong.get_text(strip=True).lower():
 
-                text = tag.parent.parent.get_text(" ", strip=True).lower()
+                parent_text = strong.parent.get_text(" ", strip=True).lower()
+
+                if "yes" in parent_text:
+                    return 1
+
+                if "no" in parent_text:
+                    return 0
+
+        return None
+    
+    def binary_vat_reader(label):
+
+        for strong in soup.find_all("strong"):
+
+            strong_text = strong.get_text(strip=True).lower()
+
+            if label.lower() in strong_text:
+
+                text = strong.parent.get_text(" ", strip=True).lower()
 
                 if "yes" in text:
                     return 1
+
                 if "no" in text:
                     return 0
 
-        return 0
+        return None
+    
    
 
 
@@ -144,12 +172,12 @@ def parse_features(url):
 
 
     #Train station distance storing
-    def get_train_distance(mode):
+    def get_distance(category, mode):
         for block in soup.find_all("div", class_="data-row"):
 
             h3 = block.find("h3")
 
-            if h3 and "Train stations" in h3.get_text():
+            if h3 and category in h3.get_text():
 
                 span = block.find("span", title=mode)
 
@@ -158,7 +186,7 @@ def parse_features(url):
 
                     distance = float(parts[0])
 
-                    if parts[1] == "km": #peut etre garder pour le "by car" et mettre en "m" uniquement pour foot
+                    if parts[1] == "km":
                         distance *= 1000
 
                     return distance
@@ -224,164 +252,21 @@ def parse_features(url):
     property_id = soup.find("span", class_ = "vlancode").get_text(strip=True)
 
 
-    def get_postal_code():
-        city = soup.find("span", class_="city-line")
-
-        if not city:
-            return None
-
-        digits = "".join(c for c in city.get_text() if c.isdigit())
-
-        if len(digits) == 4:
-            return int(digits)
-
-        return None
-    postal_code = get_postal_code()
-
-
-    #DISTANCE API
-
-    def get_distance_to_brussels(soup, lon, postal_code):
-        """
-        Returns:
-        - 0 if already in Brussels (based on postal code)
-        - driving distance in km otherwise (OSRM)
-        - None if data missing
-        """
-
-        # -----------------------------
-        # 2. Brussels postal codes check
-        # -----------------------------
-        brussels_postcodes = {
-            1000, 1020, 1030, 1040, 1050,
-            1060, 1070, 1080, 1081, 1082,
-            1083, 1090, 1140, 1150,
-            1160, 1170, 1180, 1190
-        }
-
-        if postal_code in brussels_postcodes:
-            return 0
-
-        # -----------------------------
-        # 3. Check coordinates
-        # -----------------------------
-        if lat is None or lon is None:
-            return None
-
-        # -----------------------------
-        # 4. OSRM request
-        # -----------------------------
-        brussels_lat = 50.8501
-        brussels_lon = 4.3634
-
-        url = (
-            "http://router.project-osrm.org/route/v1/driving/"
-            f"{lon},{lat};{brussels_lon},{brussels_lat}"
-            "?overview=false"
-        )
-
-        try:
-            response = requests.get(url, timeout=5)
-            data = response.json()
-
-            distance_m = data["routes"][0]["distance"]
-
-            return round(distance_m / 1000, 2)
-
-        except:
-            return None
-    lat = get_latitude()
-    lon = get_longitude()
-
-    #DISTANCE CHEF LIEU 
-    def get_distance_to_nearest_capital(lat, lon, postal_code):
-
-        if lat is None or lon is None:
-            return None, None
-
-        capitals = {
-            "Brussels": (50.8501, 4.3634),
-            "Antwerp": (51.2194, 4.4025),
-            "Ghent": (51.0543, 3.7174),
-            "Bruges": (51.2093, 3.2247),
-            "Hasselt": (50.9307, 5.3325),
-            "Leuven": (50.8798, 4.7005),
-            "Mons": (50.4542, 3.9523),
-            "Namur": (50.4674, 4.8718),
-            "Liège": (50.6326, 5.5797),
-            "Arlon": (49.6833, 5.8167)
-        }
-
-        capital_postcodes = {
-            "Brussels": {1000, 1020, 1030, 1040, 1050, 1060, 1070, 1080, 1081, 1082, 1083, 1090},
-            "Antwerp": {2000, 2018, 2020, 2030, 2040, 2050},
-            "Ghent": {9000, 9030, 9031, 9032, 9040, 9041, 9042, 9050},
-            "Bruges": {8000, 8200, 8310, 8370, 8380},
-            "Hasselt": {3500, 3510, 3520, 3530},
-            "Leuven": {3000, 3010, 3020, 3050},
-            "Mons": {7000, 7011, 7012, 7020, 7030},
-            "Namur": {5000, 5100, 5101, 5102},
-            "Liège": {4000, 4020, 4030, 4040, 4050},
-            "Arlon": {6700, 6704, 6706, 6717}
-        }
-        def haversine(lat1, lon1, lat2, lon2):
-            R = 6371
-            lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
-            dlat = lat2 - lat1
-            dlon = lon2 - lon1
-            a = math.sin(dlat/2)**2 + math.cos(lat1)*math.cos(lat2)*math.sin(dlon/2)**2
-            return 2 * R * math.atan2(math.sqrt(a), math.sqrt(1-a))
-
-        # 1. trouver la capitale "du logement" (si elle existe)
-        property_capital = None
-        if postal_code is not None:
-            for city, codes in capital_postcodes.items():
-                if postal_code in codes:
-                    property_capital = city
-                    break
-
-        # 2. calcul distances
-        distances = []
-        for city, (c_lat, c_lon) in capitals.items():
-            d = haversine(lat, lon, c_lat, c_lon)
-            distances.append((city, d))
-
-        # 3. tri
-        distances.sort(key=lambda x: x[1])
-
-        # 4. exclusion propre de la capitale du logement
-        filtered = []
-        for city, dist in distances:
-            if city != property_capital:
-                filtered.append((city, dist))
-
-        # 5. résultat final
-        if len(filtered) == 0:
-            return None, None
-
-        nearest_city, nearest_distance = filtered[0]
-
-        return round(nearest_distance, 2), nearest_city
-        
-        
-    distance, nearest_city = get_distance_to_nearest_capital(lat, lon, postal_code)
-
     #Results
     Tags = {
     
         "price_in_€" : price,
-        "vat_included" : binary_element("VAT"),
+        "vat_included" : binary_strong_element("VAT"),
         
-        "state_of_property" : get_state_of_property(),
+        "state_of_property" : get_property_info("General info", "State of the property"),
+        "heating_type" : get_property_info("Heating and energy","Type of heating"),
+        "sun_exposure" : get_property_info("Outdoor description","Orientation of the front facade"),
         "livable_surface" : value_after_h4("Surface"),
         "construction_year" : value_after_h4("Build Year"),
         "epc_score" : epc,
 
         "latitude" : get_latitude(),
         "longitude" : get_longitude(),
-        "distance_to_brussels_in_km_by_car": get_distance_to_brussels(soup, lon, postal_code),
-        "nearest_capital": nearest_city,
-        "distance_to_nearest_capital_km": distance, 
         
 
         "furnished" : binary_element("Furnished"),    
@@ -405,11 +290,28 @@ def parse_features(url):
         "flooding_area_type" : get_flooding(),
         
         
-        "distance_from_train_stations_by_foot_in_m": get_train_distance("Walking"),
-        "distance_from_train_stations_by_car_in_m": get_train_distance("Driving")}
+        "distance_from_train_stations_by_foot_in_m": get_distance("Train stations", "Walking"),
+        "distance_from_train_stations_by_car_in_m": get_distance("Train stations", "Driving"),
+        "distance_from_motorway_by_car_in_m": get_distance("Motorways", "Driving"),
+        "distance_from_bus_by_foot_in_m": get_distance("Bus", "Walking"),
+        "distance_from_tram_by_foot_in_m": get_distance("Trams", "Walking"),
+        "distance_from_metro_by_foot_in_m": get_distance("Metros", "Walking"),
+        "distance_from_nursery_by_foot_in_m": get_distance("Nurseries", "Walking"),
+        "distance_from_nursery_by_car_in_m": get_distance("Nurseries", "Driving"),
+        "distance_from_preschool_by_foot_in_m": get_distance("Preschools", "Walking"),
+        "distance_from_preschool_by_car_in_m": get_distance("Preschools", "Driving"),
+        "distance_from_elementary_school_by_foot_in_m": get_distance("Elementary schools", "Walking"),
+        "distance_from_elementary_school_by_car_in_m": get_distance("Elementary schools", "Driving"),
+        "distance_from_high_school_by_foot_in_m": get_distance("High schools", "Walking"),
+        "distance_from_high_school_by_car_in_m": get_distance("High schools", "Driving"),
+        "distance_from_supermarket_by_foot_in_m": get_distance("Supermarkets", "Walking"),
+        "distance_from_supermarket_by_car_in_m": get_distance("Supermarkets", "Driving"),
+        "distance_from_supermarket_by_transports_in_m": get_distance("Supermarkets", "Transit"),
+        "distance_from_supermarket_by_car_in_m": get_distance("Supermarkets", "Driving")
+        }
     
 
     for key, value in Tags.items():
-        print(f"- {key}: {value if value is not None else 'No information on Immovlan website'}, {type(value)}")
+        print(f"- {key}: {value if value is not None else 'None'}, {type(value)}")
         
 parse_features(url)
