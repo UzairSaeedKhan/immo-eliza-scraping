@@ -256,7 +256,7 @@ def parse_features(url):
     Tags = {
     
         "price_in_€" : price,
-        "vat_included" : binary_strong_element("VAT"),
+        "vat_included" : binary_vat_reader("VAT"),
         
         "state_of_property" : get_property_info("General info", "State of the property"),
         "heating_type" : get_property_info("Heating and energy","Type of heating"),
