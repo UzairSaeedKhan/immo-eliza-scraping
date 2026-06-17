@@ -1,6 +1,5 @@
 import asyncio, httpx, time, re
 from bs4 import BeautifulSoup
-import pandas as pd
 import polars as pl
 import time, re
 
@@ -80,7 +79,7 @@ def parse_listing_url(url):
         "city": match.group("city"),
     }
 
-async def scrape_all_provinces() -> pd.DataFrame:
+async def scrape_all_provinces() -> pl.DataFrame:
     provinces = [
     "brussels", "vlaams-brabant", "antwerp", "east-flanders", "west-flanders",
     "brabant-wallon", "limburg", "hainaut", "namur", "liege", "luxembourg" 
