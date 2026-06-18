@@ -186,7 +186,6 @@ The `dev/` folder contains exploratory notebooks used for:
 
 * requests
 * beautifulsoup4
-* pandas
 * polars
 * asyncio
 
@@ -213,4 +212,3 @@ The final dataset is generated at:
 ```
 data/scraped_properties.csv
 ```
-
