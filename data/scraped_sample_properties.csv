@@ -1,11 +1,168 @@
-province,type_property,property_url,property_id,subtype_property,type_of_contract,postal_code,city,price_in_€,vat_included,state_of_property,heating_type,sun_exposure,livable_surface_in_m²,construction_year,epc_score,latitude,longitude,furnished,nb_of_facades,nb_of_floors,nb_of_bedrooms,nb_of_bathrooms,nb_of_showers,nb_of_toilets,terrace,veranda,elevator,access_for_disabled,garden,garage,swimming_pool,cellar,attic,flooding_area_type,distance_from_train_stations_by_foot_in_m,distance_from_train_stations_by_car_in_m
-brussels,House,https://immovlan.be/en/detail/residence/for-sale/1150/sint-pieters-woluwe/vbe35189,vbe35189,residence,sale,1150,sint-pieters-woluwe,925000.0,0,To be renovated,Fuel oil,South-east,16,1936,G,50.832327,4.4528542,0,3,,5,2,2,3,1,0,0,0,1,0,0,0,0,(information not available),4300.0,5600.0
-brussels,Apartment,https://immovlan.be/en/detail/duplex/for-sale/1000/brussels/vbe35095,vbe35095,duplex,sale,1000,brussels,395000.0,0,Excellent,Gas,,13,1900,E,50.8469517,4.3876671,1,2,4,2,2,1,2,0,0,0,0,0,0,0,0,0,no flooding area,781.0,913.0
-brussels,Apartment,https://immovlan.be/en/detail/apartment/for-sale/1210/sint-joost-ten-node/vbe35094,vbe35094,apartment,sale,1210,sint-joost-ten-node,295000.0,0,Normal,Gas,,10,1902,D,50.8516118,4.3733382,0,2,3,2,1,1,1,1,0,0,0,0,0,0,1,0,no flooding area,1100.0,1300.0
-brussels,Apartment,https://immovlan.be/en/detail/apartment/for-sale/1050/elsene/vbe35040,vbe35040,apartment,sale,1050,elsene,465000.0,1,Fully renovated,Gas,,14,1959,C,50.8235717,4.3766927,0,,8,2,1,1,1,1,0,1,0,0,0,0,0,0,no flooding area,995.0,1500.0
-brussels,Apartment,https://immovlan.be/en/detail/apartment/for-sale/1080/sint-jans-molenbeek/vbe34837,vbe34837,apartment,sale,1080,sint-jans-molenbeek,259000.0,1,Normal,Gas,,13,1978,C,50.8511063,4.3068291,0,2,7,3,2,2,1,1,0,1,0,0,0,0,1,0,(information not available),1200.0,1500.0
-brussels,Apartment,https://immovlan.be/en/detail/studio/for-sale/1210/sint-joost-ten-node/vbe34652,vbe34652,studio,sale,1210,sint-joost-ten-node,150000.0,1,To renovate,Electricity,,34,1965,F,50.8512144,4.3742387,0,2,5,0,1,,,1,0,1,0,0,0,0,0,0,(information not available),1200.0,1400.0
-brussels,Apartment,https://immovlan.be/en/detail/apartment/for-sale/1180/ukkel/vbe34650,vbe34650,apartment,sale,1180,ukkel,190000.0,0,To be renovated,,,50,,G,50.8103165,4.3415279,0,2,4,1,1,1,1,1,0,0,0,0,0,0,0,0,no flooding area,1800.0,2500.0
-brussels,Apartment,https://immovlan.be/en/detail/studio/for-sale/1180/ukkel/rbw19605,rbw19605,studio,sale,1180,ukkel,155000.0,0,Excellent,Not specified,,54,1978,F,50.8,4.3333333,0,,,1,1,,,0,0,0,0,0,0,0,0,0,(information not available),847.0,872.0
-brussels,Apartment,https://immovlan.be/en/detail/duplex/for-sale/1070/anderlecht/vbe34263,vbe34263,duplex,sale,1070,anderlecht,319000.0,0,To renovate,Gas,,15,1944,G,50.8455239,4.3242407,0,2,3,3,1,1,2,1,0,0,0,0,0,0,1,0,(information not available),476.0,560.0
-brussels,House,https://immovlan.be/en/detail/mixed-building/for-sale/1160/oudergem/vbe34034,vbe34034,mixed-building,sale,1160,oudergem,625000.0,0,Normal,Gas,,21,1915,E,50.8206834,4.4098093,0,2,,4,2,,3,1,0,0,0,1,0,0,0,0,(information not available),589.0,603.0
+province,type_property,property_url,property_id,subtype_property,type_of_contract,postal_code,city,description,price_in_€,vat_included,state_of_property,heating_type,sun_exposure,livable_surface_in_m²,construction_year,epc_score,latitude,longitude,furnished,nb_of_facades,nb_of_floors,nb_of_bedrooms,nb_of_bathrooms,nb_of_showers,nb_of_toilets,terrace,veranda,elevator,access_for_disabled,garden,garage,swimming_pool,cellar,attic,flooding_area_type,distance_from_train_stations_by_foot_in_m,distance_from_train_stations_by_car_in_m,distance_from_motorway_by_car_in_m,distance_from_bus_by_foot_in_m,distance_from_tram_by_foot_in_m,distance_from_metro_by_foot_in_m,distance_from_nursery_by_foot_in_m,distance_from_nursery_by_car_in_m,distance_from_preschool_by_foot_in_m,distance_from_preschool_by_car_in_m,distance_from_elementary_school_by_foot_in_m,distance_from_elementary_school_by_car_in_m,distance_from_high_school_by_foot_in_m,distance_from_high_school_by_car_in_m,distance_from_supermarket_by_foot_in_m,distance_from_supermarket_by_car_in_m,distance_from_supermarket_by_transports_in_m
+brussels,House,https://immovlan.be/en/detail/residence/for-sale/1150/sint-pieters-woluwe/vbe35189,vbe35189,residence,sale,1150,sint-pieters-woluwe,"LA MAISON – HOLISTIC PROPERTIES GROUP is pleased to present this stunning property, ideally located in the heart of a highly sought-after residential area, combining greenery with immediate proximity to Stockel, public transport, and numerous amenities.
+Upon entering, the tone is immediately set: an entrance hall with vestibule, cloakroom, and guest toilets reflects space, functionality, and comfort.
+The ground floor offers elegant reception rooms, including a spacious living room, a large central hallway, a dining room, and a separate kitchen.
+These living spaces open directly onto a pleasant terrace, extending into a beautiful garden, creating a green and privileged living environment, ideal for relaxation and entertaining.
+Adjacent to the kitchen, a corridor with built-in storage provides additional practicality and ensures smooth circulation throughout the house.
+The first floor hosts the night area with three comfortable bedrooms. The master suite benefits from its own dressing room, en-suite bathroom, and separate toilet, offering a private and refined living space. The two additional bedrooms share a separate bathroom.
+The top floor, set under the roof, offers two further bedrooms, ideal as children’s rooms, a home office, guest rooms, or leisure spaces.
+In total, the property offers 5 bedrooms and 2 bathrooms, with a highly functional layout and excellent potential. The cellars and garage complete this property.
+Renovation work is to be expected, offering an excellent opportunity to reimagine the spaces and fully enhance the property’s potential.
+A prime address, an exceptional location, and strong potential: a rare opportunity for those seeking a family home to personalize to their taste.
+Urban planning information requested on 20/04.
+For further information or to arrange a viewing:
+Contact
+Tel
+02/669.23.03
+Show all
+Show less",925000.0,0,To be renovated,Fuel oil,South-east,16,1936,G,50.832327,4.4528542,0,3,,5,2,2,3,1,,0,,1,,,,,(information not available),4300.0,5600.0,4700.0,149.0,165.0,1500.0,185.0,1200.0,352.0,928.0,352.0,928.0,352.0,928.0,168.0,1300.0,168.0
+brussels,Apartment,https://immovlan.be/en/detail/duplex/for-sale/1000/brussels/vbe35095,vbe35095,duplex,sale,1000,brussels,"✨ FOR SALE – 2 bedroom souplex – European Quarter ✨
+📍 Rue des Patriotes 9, 1000 Brussels
+Located in the very heart of the European Quarter, this 2-bedroom duplex souplex offers a smart layout and excellent living comfort.
+🔹 2 bedrooms located on the lower level
+🔹 Mezzanine of approx. 12 sqm
+🔹 Open-plan, fully equipped kitchen
+🔹 Front-facing living room with shutter
+🔹 2 toilets
+🔹 Bathroom + shower room
+🔹 Large dressing room
+🔹 Winter garden 🌿
+🔹 Individual gas condensing boiler
+🔹 Low service charges
+🔹 Electrical installation compliant
+🔹 EPC : E
+An ideal property for owner-occupation or investment, in a prime location close to European institutions, public transport and shops.
+📞 Info & viewings:
+Frédéric Top –
+Tel
++32 472 34 44 08
+📩
+Contact
+We Invest Brussels-Europe
+🔍 Other properties for sale in Brussels and the European Quarter available on 👉 weinvest.be
+Show all
+Show less",395000.0,0,Excellent,Gas,,13,1900,E,50.8469517,4.3876671,1,2,4,2,2,1,2,,,0,0,,,,,,no flooding area,781.0,913.0,2000.0,18.0,1200.0,1300.0,123.0,650.0,157.0,684.0,157.0,684.0,184.0,232.0,238.0,278.0,238.0
+brussels,Apartment,https://immovlan.be/en/detail/apartment/for-sale/1210/sint-joost-ten-node/vbe35094,vbe35094,apartment,sale,1210,sint-joost-ten-node,"SAINT-JOSSE-TEN-NOODE – 2-bedroom apartment with terrace in a character building
+Ideally located at Rue Saint-Josse 13 in Saint-Josse-ten-Noode, in the heart of a vibrant and sought-after area, close to the European institutions, the city centre, shops, public transport and all amenities, this charming ± 70 m² apartment is set within a small condominium of only 5 units.
+The apartment features a bright and pleasant living area, a kitchen, two bedrooms, a bathroom, and a terrace, a real asset to enjoy outdoor space in the city.
+You will be charmed by the character of this beautiful period building, offering architectural charm and a strategic location between the European district and central Brussels.
+Key features:
+✔ ± 70 m² apartment
+✔ 2 bedrooms
+✔ Terrace
+✔ Small condominium of 5 units
+✔ Low common charges
+✔ Compliant electricity installation
+✔ EPC rating: D-
+✔ Excellent location near shops, public transport and EU institutions
+Whether for personal use or as an investment, this apartment represents a great opportunity in a rapidly developing area with strong rental demand.
+Information & viewings:
+Rebecca Hallal – Real Estate Agent
+📞
+Tel
++32 472 12 62 42
+✉️
+Contact
+We Invest Brussels-Europe
+Show all
+Show less",295000.0,0,Normal,Gas,,10,1902,D,50.8516118,4.3733382,0,2,3,2,1,1,1,1,,0,0,,,,1,,no flooding area,1100.0,1300.0,3200.0,175.0,676.0,517.0,177.0,340.0,173.0,258.0,173.0,258.0,237.0,402.0,262.0,669.0,262.0
+brussels,Apartment,https://immovlan.be/en/detail/apartment/for-sale/1050/elsene/vbe35040,vbe35040,apartment,sale,1050,elsene,"Information and viewing:
+Tel
+02 315 51 71
+.
+Located at Rdpt de l'Etoile 5, next to the highly sought-after Avenue Louise, a stone's throw from the Bois and the Abbaye de la Cambre, We Invest is offering this superb 2-bedroom apartment of ±83 m² gross floor area, in renovated condition. It comprises an entrance hall leading to a separate toilet, a large, bright living room with terrace, a separate, fully equipped kitchen of ±8 m² with balcony, two beautiful bedrooms (14 and 9 m²), and a bathroom. Recent double glazing, compliant electrical system, EPC: C. Elevator, healthy co-ownership, cellar included.
+Don't wait to visit !
+Show all
+Show less",465000.0,1,Fully renovated,Gas,,14,1959,C,50.8235717,4.3766927,0,,8,2,1,1,1,1,,1,0,,,,,,no flooding area,995.0,1500.0,3600.0,239.0,544.0,2100.0,291.0,1200.0,269.0,1200.0,269.0,1200.0,561.0,986.0,591.0,751.0,591.0
+brussels,Apartment,https://immovlan.be/en/detail/apartment/for-sale/1080/sint-jans-molenbeek/vbe34837,vbe34837,apartment,sale,1080,sint-jans-molenbeek,"Information and viewings:
+Contact
+|
+Tel
+02 315 77 22
+|
+We Invest is pleased to present this three-bedroom apartment, located on the 3rd floor.
+With a surface area of 105 m², it is situated in a quiet street while benefiting from a strategic location in immediate proximity to all amenities. The apartment stands out for its generous volumes and beautiful natural light.
+Located on the 3rd floor of a well-maintained 7-storey building and harmoniously laid out, it features three comfortable bedrooms, two bathrooms, and a spacious, bright living room ensuring a pleasant living environment on a daily basis.
+Its main asset lies in its two large, ideally oriented outdoor spaces, allowing you to fully enjoy natural light throughout the day.
+The apartment is in good overall condition, fitted with PVC double-glazed windows and benefits from an excellent EPC rating.
+EPC C+ – 107 kWh/(m².year) – CO₂: 27 kg/(m².year).
+A cellar completes the property.
+The well-managed co-ownership includes a new cogeneration boiler, a secure bicycle storage room, and a waste disposal room.
+An ideal property for a family or as an investment combining comfort, space, and brightness.
+Ready to welcome its new owners.
+Information and viewings:
+Contact
+|
+Tel
+02 315 77 22
+Show all
+Show less",259000.0,1,Normal,Gas,,13,1978,C,50.8511063,4.3068291,,2,7,3,2,2,1,1,,1,,,,,1,,(information not available),1200.0,1500.0,2200.0,56.0,766.0,1100.0,471.0,827.0,219.0,619.0,219.0,619.0,669.0,1000.0,342.0,924.0,342.0
+brussels,Apartment,https://immovlan.be/en/detail/studio/for-sale/1210/sint-joost-ten-node/vbe34652,vbe34652,studio,sale,1210,sint-joost-ten-node,"Located on the 5th and top floor (with lift access) of a small block of flats, this cosy studio in Saint-Josse-ten-Noode will immediately win you over with its main attraction: a large covered terrace of ±15 m² offering completely open views – a rarity in the heart of Brussels.
+A true extension of the living space, this terrace offers a calm and soothing setting, a real haven of peace just a stone’s throw from the hustle and bustle of the city.
+Ideally located halfway between Place Madou and Square Armand Steurs, the property has excellent connectivity thanks to public transport links and its proximity to the European Quarter.
+The studio comprises an entrance hall with a separate wall-mounted toilet, a pleasant living/bedroom area with an open-plan cooking area giving direct access to the terrace, as well as a separate shower room with space for a washing machine.
+The property has already been renovated (kitchen area, shower room and WC) and now only requires a refresh of the finishes to fully realise its enormous potential.
+Electrical installations compliant, heat pump providing heating and air conditioning, security door and double-glazed windows.
+An ideal opportunity for a first-time buyer or an investment offering excellent rental returns.
+Layout:
+Entrance hall
+Separate wall-mounted toilet with washbasin
+Bright living room/bedroom
+Renovated open-plan kitchen area
+Direct access to the terrace from the living room
+Renovated shower room
+Space for a washing machine
+Comfort & location:
+Ideal location between Madou and Square Armand Steurs
+Immediate proximity to public transport
+Quick access to the European Quarter
+Electrical installation up to standard
+Heat pump (heating/air conditioning)
+Security door
+Double-glazed windows
+Service charges approx. €86/month (communal + cold water)
+PEB F
+Ideal for first-time buyers or rental investment
+The property’s highlights:
+5th and top floor with lift
+Small block of flats
+Magnificent covered terrace of approx. 15 m²
+Completely unobstructed view with no overlooking neighbours
+A true haven of peace right in the city centre
+Rare outdoor space for the neighbourhood
+Great potential after refurbishment
+Show all
+Show less",150000.0,1,To renovate,Electricity,,34,1965,F,50.8512144,4.3742387,0,2,5,0,1,,,1,,1,0,,,,0,,(information not available),1200.0,1400.0,3200.0,180.0,757.0,593.0,109.0,483.0,197.0,565.0,197.0,565.0,133.0,507.0,260.0,271.0,260.0
+brussels,Apartment,https://immovlan.be/en/detail/apartment/for-sale/1180/ukkel/vbe34650,vbe34650,apartment,sale,1180,ukkel,"Uccle – 1-bedroom apartment in need of full renovation with outdoor space
+Located in a sought-after area of Uccle, close to shops, public transport, schools and all urban amenities, LA MAISON – Holistic Properties Group presents this one-bedroom apartment, situated on the ground floor of a small-scale building of 10 units.
+The apartment comprises a bright living area, a kitchen space to be designed according to your preferences, a bedroom and a bathroom. The property offers a solid base to fully redesign the layout according to your needs and lifestyle.
+The property also benefits from a small outdoor space, which can be transformed into a cosy terrace, ideal for enjoying sunny days in a peaceful setting.
+The apartment requires renovation, making it an excellent opportunity for those looking to create a tailor-made project, whether for personal use or as an investment in a highly desirable area of Brussels.
+The property has an EPC rating of G.
+For further information or to arrange a visit:
+LA MAISON – Holistic Properties Group
+Contact
+Show all
+Show less",190000.0,0,To be renovated,,,50,,G,50.8103165,4.3415279,0,2,4,1,1,1,1,1,,0,0,,,,,,no flooding area,1800.0,2500.0,3700.0,178.0,351.0,,257.0,257.0,205.0,205.0,205.0,205.0,774.0,954.0,411.0,446.0,411.0
+brussels,Apartment,https://immovlan.be/en/detail/studio/for-sale/1180/ukkel/rbw19605,rbw19605,studio,sale,1180,ukkel,"Les Érables Assisted Living Residence welcomes you in a peaceful setting comprising 40 apartments. The management and staff are dedicated to the residents’ well-being, offering a wide range of services that combine independence, comfort, and security. Ideally located in a sought-after area in the heart of Uccle, the residence enjoys a prime location within walking distance of numerous shops and amenities. This fully renovated 54 m² apartment is situated on the first floor at the front of the residence and is accessible via two elevators. The apartment consists of an entrance hall with a newly fitted kitchenette, a bright living room, one bedroom with built-in wardrobes, a shower room with WC, and a private cellar/storage unit. Rent: €650 per month, plus service charges and the residence service contract. Permanent Security and Support Services Reception desk staffed 24/7 Emergency call system Central fire alarm system Internal telephone system Technical assistance and maintenance interventions Administrative support Coordination of healthcare providers Medication management Parcel reception and dispatch Organization of private meals and events Laundry service Taxi booking and various assistance services through reception
+Show all
+Show less",155000.0,,Excellent,Not specified,,54,1978,F,50.8,4.3333333,,,,1,1,,,,,,,,,,,,(information not available),847.0,872.0,2700.0,137.0,412.0,,731.0,731.0,734.0,734.0,734.0,734.0,268.0,888.0,369.0,1100.0,369.0
+brussels,Apartment,https://immovlan.be/en/detail/duplex/for-sale/1070/anderlecht/vbe34263,vbe34263,duplex,sale,1070,anderlecht,"Info:
+Contact
+or
+Tel
+02 315 77 22
+Discover without delay this spacious duplex apartment located on the 3rd and 4th floors of a small building in Anderlecht, in the immediate vicinity of all amenities (public transport, shops, schools).
+The property consists, on the first level, of an entrance hall leading to a shower room with access to a rear balcony offering an open view, a first master bedroom with dressing room, an office, two additional bedrooms, and a separate toilet.
+Upstairs, you will be charmed by the bright living areas including a living room, dining room, and open-plan kitchen, all giving access to a pleasant rear-facing terrace. A second bathroom completes this level.
+The apartment benefits from individual installations (gas boiler, electricity), double-glazed window frames, some equipped with electric blinds, as well as low common charges.
+Refreshing works are to be expected in order to modernize the property and optimize its energy performance, thus offering great value-enhancement potential.
+PEB > G - CO2: 88 kg/(m².year) - 438 [kWhEP/(m².year)] - Don’t miss any of our exclusive listings on our website WWW.WEINVEST.BE
+.
+Show all
+Show less",319000.0,0,To renovate,Gas,,15,1944,G,50.8455239,4.3242407,0,2,3,3,1,1,2,1,,0,0,,,,1,,(information not available),476.0,560.0,3300.0,92.0,449.0,192.0,331.0,323.0,284.0,317.0,284.0,317.0,421.0,416.0,465.0,457.0,465.0
+brussels,House,https://immovlan.be/en/detail/mixed-building/for-sale/1160/oudergem/vbe34034,vbe34034,mixed-building,sale,1160,oudergem,"Chaussée de Wavre, in the Saint-Julien neighbourhood, close to Hankar metro station, the Chant d'Oiseau neighbourhood and all amenities, commercial property + renovated residential house (between 2003 and 2012) of +/- 188m² (according to EPC) + covered terrace and garden spread over 4 levels (ground floor + 2 floors + basement). The house comprises on the ground floor: an entrance hall with separate WC and 3 rooms in a row (commercial space, living room and kitchen). On the 1st floor: night hall, 2 bedrooms + study (with independent access) one of which has an en-suite bathroom with WC. On the 2nd floor: night hall with separate WC, 2 bedrooms with access to the central bathroom. In the basement: 5 cellars. Mixed condensing gas wall boiler. PVC double glazed windows. EPC: E-. Available upon deed. More information on our website:
+www.immobolle.be
+(reference: 7728203)
+Show all
+Show less",625000.0,,Normal,Gas,,21,1915,E,50.8206834,4.4098093,0,2,,4,2,,3,1,,,,1,,,,,(information not available),589.0,603.0,1300.0,13.0,1200.0,359.0,198.0,220.0,168.0,169.0,168.0,169.0,235.0,236.0,103.0,104.0,103.0
