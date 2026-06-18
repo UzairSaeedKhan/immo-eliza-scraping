@@ -37,6 +37,11 @@ Main components:
 
 ```
 .
+├── assets/
+│   ├── runtime_before_async.png
+│   ├── runtime_after_async.png
+│   └── carbon_emission.png
+│
 ├── data/
 │   ├── property_listings.csv
 │   └── scraped_properties.csv
@@ -153,6 +158,24 @@ It improves performance by scraping several pages simultaneously while limiting 
 
 ---
 
+## Performance: Synchronous vs. Asynchronous Scraping
+
+The listing scraper was migrated from a synchronous to an asynchronous implementation (`async_utils.py`) to speed up data collection across all 10 Belgian provinces.
+
+**Before (synchronous):**
+
+![Runtime before async](assets/runtime_before_async.png)
+
+The synchronous run took close to **8 minutes** to scrape all provinces and produced inconsistent listing counts per province (e.g. only 18 listings for Antwerpen), suggesting requests were sometimes failing or getting cut short.
+
+**After (asynchronous):**
+
+![Runtime after async](assets/runtime_after_async.png)
+
+After switching to concurrent requests, the same full-province scrape completed in roughly **1.2 minutes**, around a **6-7x speedup**, with consistent listing counts collected across every province.
+
+---
+
 ## Data Output
 
 The pipeline generates:
@@ -184,6 +207,28 @@ The `dev/` folder contains exploratory notebooks used for:
 * testing scraping functions
 * data exploration
 * feature validation
+
+---
+
+## Carbon Emissions Tracking
+
+The pipeline uses **codecarbon** (via `emissions.py`) to track the environmental footprint of each scraping run.
+
+![Carbon emissions report](assets/carbon_emission.png)
+
+A sample run logged the following:
+
+| Metric | Value |
+|--------|-------|
+| Duration | ~1345 s (~22.4 min) |
+| Emissions | ~0.000229 kg CO2eq |
+| Emissions rate | ~1.70e-07 kg/s |
+| CPU power | 2.53 W |
+| GPU power | 0.13 W |
+| RAM power | 3.0 W |
+| Water consumed | 0.0 L |
+
+This lets the team monitor and compare the sustainability impact of pipeline changes, such as the move to asynchronous scraping above.
 
 ---
 
