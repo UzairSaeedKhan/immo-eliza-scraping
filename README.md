@@ -37,9 +37,14 @@ Main components:
 
 ```
 .
+├── assets/
+│   ├── carbon_emission.png
+│   ├── runtime_after_async.png
+│   ├── runtime_before_async.png
+│
 ├── data/
 │   ├── emissions.csv
-│   ├── powermetrics_log.csv
+│   ├── powermetrics_log.txt
 │   ├── property_listings.csv
 │   └── scraped_properties.csv
 │
@@ -52,8 +57,9 @@ Main components:
 │   ├── property_listings_scraper.py
 │   └── utils.py
 │
-├── main.py
 ├── .gitignore
+├── main.py
+├── README.md
 └── requirements.txt
 
 ```
