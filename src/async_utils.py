@@ -13,7 +13,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-def make_client():
+def make_client() -> httpx.AsyncClient:
     headers = {
         "User-Agent": (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -27,7 +27,7 @@ def make_client():
     return httpx.AsyncClient(headers=headers, timeout=10)
 
 
-async def scrape_page(url, client, parse_function):
+async def scrape_page(url, client, parse_function) -> dict | None:
     """
     Fetches one property page asynchronously and parses it using parse_function.
     """
@@ -52,7 +52,7 @@ async def scrape_page(url, client, parse_function):
     return None
 
 
-async def scrape_all(urls, parse_function, max_concurrent=10):
+async def scrape_all(urls, parse_function, max_concurrent=10) -> list[dict]:
     """
     Scrapes all URLs concurrently while strictly limiting the max active connections.
     """
@@ -63,7 +63,7 @@ async def scrape_all(urls, parse_function, max_concurrent=10):
     semaphore = asyncio.Semaphore(max_concurrent)
     completed = 0
 
-    async def worker(url):
+    async def worker(url) -> dict | None:
         nonlocal completed
         async with semaphore:
             result = await scrape_page(url, client, parse_function)

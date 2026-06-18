@@ -11,6 +11,15 @@ common_params = {
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
 
 async def scrape_listings_by_province(client, semaphore, province, target=1000, max_pages=50) -> list:
+    """
+    Paginate through Immovlan's listing search results for a single province,
+    collecting property URLs and a few fields parsed from each URL until either
+    'target' listings are collected or 'max_pages' is reached.
+ 
+    Runs as one "task" among many in scrape_all_provinces(); the semaphore is
+    shared across all provinces to cap total concurrent requests.
+    """
+
     results = []
     for page in range(1, max_pages + 1):
         params = {**common_params, "provinces": province, "page": page}
@@ -59,6 +68,13 @@ async def scrape_listings_by_province(client, semaphore, province, target=1000, 
 
 
 def parse_listing_url(url):
+    """
+    Extract structured fields out of an Immovlan listing URL, e.g.:
+    /detail/<subtype>/<contract>/<postal_code>/<city>/<property_id>
+ 
+    Returns a dict of Nones if the URL doesn't match the expected shape.
+    """
+
     URL_PATTERN = re.compile(
     r"/detail/(?P<subtype>[^/]+)/(?P<contract>[^/]+)/(?P<postal_code>\d+)/(?P<city>[^/]+)/(?P<property_id>[^/]+)"
     )
@@ -81,6 +97,14 @@ def parse_listing_url(url):
     }
 
 async def scrape_all_provinces() -> pl.DataFrame:
+    """
+    Top-level entry point: fan out scrape_listings_by_province() across all
+    Belgian provinces + Brussels concurrently, then flatten the
+    results into a single Polars DataFrame.
+ 
+    Concurrency is controlled by a single shared semaphore.
+    """
+
     provinces = [
     "brussels", "vlaams-brabant", "antwerp", "east-flanders", "west-flanders",
     "brabant-wallon", "limburg", "hainaut", "namur", "liege", "luxembourg" 

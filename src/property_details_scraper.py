@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import json
 
 
-def value_after_h4(label,soup):
+def value_after_h4(label,soup) -> int | str | None:
     """
     Extracts the value associated with a given <h4> label
     Example:
@@ -11,6 +11,7 @@ def value_after_h4(label,soup):
     # <p>3</p>
     # returns -> 3
     """
+    
     h4 = soup.find("h4", string=lambda x: x and label.lower() in x.lower())
     if not h4:
         return None
@@ -26,7 +27,7 @@ def value_after_h4(label,soup):
         return int(float(value)) #improvement
     return value 
 
-def get_property_info(section_title, field_name,soup):
+def get_property_info(section_title, field_name,soup) -> str | None:
     """
     Extract a specific field value from a given property section
     on the Immovlan webpage.
@@ -38,6 +39,7 @@ def get_property_info(section_title, field_name,soup):
     Returns:
         str or None: The extracted value if found, otherwise None.
     """
+
     section_title = section_title.lower()
     field_name = field_name.lower()
      
@@ -57,14 +59,14 @@ def get_property_info(section_title, field_name,soup):
     return None
 
 
-def binary_element(label,soup):
+def binary_element(label,soup) -> 1 | 0 | None:
     """
     Extract a binary feature from the property page.
 
     The function tries to convert textual property features into:
-    - 1 = Yes
-    - 0 = No
-    - None = information not available
+    1 = Yes
+    0 = No
+    None = information not available
 
     It supports two possible HTML patterns:
     1. Structured <h4> blocks (preferred source)
@@ -81,7 +83,7 @@ def binary_element(label,soup):
 
     return None
 
-def binary_vat_reader(label,soup):
+def binary_vat_reader(label,soup) -> 1 | 0 | None:
     """
     Extract VAT-related binary information from the HTML.
 
@@ -90,10 +92,9 @@ def binary_vat_reader(label,soup):
         0 if VAT is mentioned as "no"
         None if no information is found
     """
-    #Normalize label once (avoid repeated .lower() calls inside loop)
+
     label = label.lower()
 
-    #Iterate over all <strong> tags (possible key-value indicators in the page)
     for strong in soup.find_all("strong"):
 
         strong_text = strong.get_text(strip=True).lower()
@@ -111,10 +112,11 @@ def binary_vat_reader(label,soup):
 
     return None
 
-def get_description(soup):
+def get_description(soup) -> str | None:
     """
     Take the description of the property
     """
+
     description_div = soup.find("div", class_="dynamic-description")
 
     if description_div:
@@ -122,7 +124,7 @@ def get_description(soup):
 
     return None
 
-def get_distance(category, mode,soup):
+def get_distance(category, mode,soup) -> float | None:
     """
     Extract distance information for a given category (e.g. Train stations)
     and transport mode (e.g. Walking, Driving).
@@ -131,6 +133,7 @@ def get_distance(category, mode,soup):
         Distance in meters as float if found,
         otherwise None.
     """
+
     for block in soup.find_all("div", class_="data-row"):
         h3 = block.find("h3")
         if h3 and category in h3.get_text():
@@ -144,13 +147,14 @@ def get_distance(category, mode,soup):
     return None
     
     
-def get_latitude(soup):
+def get_latitude(soup) -> float | None:
     """
     Extract latitude value from embedded JSON scripts in the HTML.
 
     Returns:
         float latitude if found, otherwise None
     """
+
     for script in soup.find_all("script"):
         try:
             data = json.loads(script.string)
@@ -160,13 +164,14 @@ def get_latitude(soup):
             continue
     return None
     
-def get_longitude(soup):
+def get_longitude(soup) -> float | None:
     """
     Extract longitude value from embedded JSON scripts in the HTML.
 
     Returns:
         float longitude if found, otherwise None
     """
+
     for script in soup.find_all("script"):
         try:
             data = json.loads(script.string)
@@ -177,7 +182,7 @@ def get_longitude(soup):
     return None
     
     
-def parse_features(html):
+def parse_features(html) -> dict:
     """
     Extracts key property listing details from the HTML page:
 
@@ -185,8 +190,9 @@ def parse_features(html):
     - Advertised property price, cleaned and normalized from the displayed format.
     - Unique property listing identifier (Property ID / Vlan Code).
 
-    The extracted data is intended for storage, analysis, or further processing.
+    The extracted data is intended for storage, analysis, and further processing.
     """
+
     soup = BeautifulSoup(html, "html.parser")
     meta_desc = soup.find("meta", attrs={"name": "description"})
     
@@ -199,7 +205,7 @@ def parse_features(html):
             epc = match.group(1)
 
    
-    #Price
+    #Price (EUR)
     price_raw = soup.find("span", class_="detail__header_price_data")
     if price_raw:
         raw_text = price_raw.get_text(strip=True)
@@ -210,14 +216,17 @@ def parse_features(html):
     property_id = soup.find("span", class_ = "vlancode").get_text(strip=True)
     
     tags = {
+        # Distances are calculated in meters, 
+        # Surface are calculated in square meters.
+
         "property_id": property_id,
-        "price_in_€" : price,
+        "price" : price,
         "vat_included" : binary_element("VAT",soup),  
         
         "state_of_property" : get_property_info("General info", "State of the property", soup),
         "heating_type" : get_property_info("Heating and energy","Type of heating",soup),
         "sun_exposure" : get_property_info("Outdoor description","Orientation of the front facade", soup),
-        "livable_surface_in_m²" : value_after_h4("Surface", soup),
+        "livable_surface" : value_after_h4("Surface", soup),
         "construction_year" : value_after_h4("Build Year",soup),
         "epc_score" : epc,
         
@@ -225,12 +234,12 @@ def parse_features(html):
         "longitude" : get_longitude(soup), 
         
         "furnished" : binary_element("Furnished",soup),    
-        "nb_of_facades" : value_after_h4("Number of facades",soup),
-        "nb_of_floors" : value_after_h4("Number of floors",soup),
-        "nb_of_bedrooms" : value_after_h4("Number of bedrooms",soup),
-        "nb_of_bathrooms" : value_after_h4("Number of bathrooms",soup),
-        "nb_of_showers" : value_after_h4("Number of showers",soup),
-        "nb_of_toilets" : value_after_h4("Number of toilets",soup),    
+        "facades" : value_after_h4("Number of facades",soup),
+        "floors" : value_after_h4("Number of floors",soup),
+        "bedrooms" : value_after_h4("Number of bedrooms",soup),
+        "bathrooms" : value_after_h4("Number of bathrooms",soup),
+        "showers" : value_after_h4("Number of showers",soup),
+        "toilets" : value_after_h4("Number of toilets",soup),    
         
         "terrace" : binary_element("Terrace",soup),
         "veranda" : binary_element("Veranda",soup),
@@ -244,24 +253,24 @@ def parse_features(html):
         
         "flooding_area_type" : get_property_info("Town planning and environmental risks", "flooding area type",soup),   
         
-        "distance_from_train_stations_by_foot_in_m": get_distance("Train stations", "Walking",soup),
-        "distance_from_train_stations_by_car_in_m": get_distance("Train stations", "Driving",soup),
-        "distance_from_motorway_by_car_in_m": get_distance("Motorways", "Driving",soup),
-        "distance_from_bus_by_foot_in_m": get_distance("Bus", "Walking",soup),
-        "distance_from_tram_by_foot_in_m": get_distance("Trams", "Walking",soup),
-        "distance_from_metro_by_foot_in_m": get_distance("Metros", "Walking",soup),
-        "distance_from_nursery_by_foot_in_m": get_distance("Nurseries", "Walking",soup),
-        "distance_from_nursery_by_car_in_m": get_distance("Nurseries", "Driving",soup),
-        "distance_from_preschool_by_foot_in_m": get_distance("Preschools", "Walking",soup),
-        "distance_from_preschool_by_car_in_m": get_distance("Preschools", "Driving",soup),
-        "distance_from_elementary_school_by_foot_in_m": get_distance("Elementary schools", "Walking",soup),
-        "distance_from_elementary_school_by_car_in_m": get_distance("Elementary schools", "Driving",soup),
-        "distance_from_high_school_by_foot_in_m": get_distance("High schools", "Walking",soup),
-        "distance_from_high_school_by_car_in_m": get_distance("High schools", "Driving",soup),
-        "distance_from_supermarket_by_foot_in_m": get_distance("Supermarkets", "Walking",soup),
-        "distance_from_supermarket_by_car_in_m": get_distance("Supermarkets", "Driving",soup),
-        "distance_from_supermarket_by_transports_in_m": get_distance("Supermarkets", "Transit",soup),
-        "distance_from_supermarket_by_car_in_m": get_distance("Supermarkets", "Driving",soup),
+        "distance_from_train_stations_by_foot": get_distance("Train stations", "Walking",soup),
+        "distance_from_train_stations_by_car": get_distance("Train stations", "Driving",soup),
+        "distance_from_motorway_by_car": get_distance("Motorways", "Driving",soup),
+        "distance_from_bus_by_foot": get_distance("Bus", "Walking",soup),
+        "distance_from_tram_by_foot": get_distance("Trams", "Walking",soup),
+        "distance_from_metro_by_foot": get_distance("Metros", "Walking",soup),
+        "distance_from_nursery_by_foot": get_distance("Nurseries", "Walking",soup),
+        "distance_from_nursery_by_car": get_distance("Nurseries", "Driving",soup),
+        "distance_from_preschool_by_foot": get_distance("Preschools", "Walking",soup),
+        "distance_from_preschool_by_car": get_distance("Preschools", "Driving",soup),
+        "distance_from_elementary_school_by_foot": get_distance("Elementary schools", "Walking",soup),
+        "distance_from_elementary_school_by_car": get_distance("Elementary schools", "Driving",soup),
+        "distance_from_high_school_by_foot": get_distance("High schools", "Walking",soup),
+        "distance_from_high_school_by_car": get_distance("High schools", "Driving",soup),
+        "distance_from_supermarket_by_foot": get_distance("Supermarkets", "Walking",soup),
+        "distance_from_supermarket_by_car": get_distance("Supermarkets", "Driving",soup),
+        "distance_from_supermarket_by_transports": get_distance("Supermarkets", "Transit",soup),
+        "distance_from_supermarket_by_car": get_distance("Supermarkets", "Driving",soup),
         
         "description" : get_description(soup)
     }
