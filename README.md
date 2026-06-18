@@ -1,19 +1,19 @@
-# Real Estate Scraper: Immo-Eliza-scraping
+# Real Estate Scraper: Immo Eliza-scraping
 
 ## Team
 
-Developed by **Team Polars Bears** as part of the Immo Eliza project.
+Developed by **Team Polar(s) Bears** as part of the Immo Eliza project.
 
 Team members:
 
-| Name |
-|------|
-| Iness |     as the Lead manager
-| Uzair |     as the Git commander
-| Guillermo | as the Data architect
-| Hiba |      as the Documentation specialist
+| Name | Role |
+|------|------|
+| Iness | Project Lead |
+| Uzair | Git Commander |
+| Guillermo | Data Architect |
+| Hiba | Documentation Specialist |
 
-We were initially the Pandas, but after switching from the Pandas library to Polars, we became the Polars Bears.
+We were initially the Pandas, but after deciding to switch from the Pandas library to Polars, we became the Polar(s) Bears.
 
 ## Description
 
@@ -21,7 +21,7 @@ This project is part of the **Immo Eliza** real estate data pipeline.
 
 The goal is to build a complete scraping pipeline to collect and enrich real estate data in Belgium in order to create a dataset for future machine learning models predicting property prices.
 
-The pipeline collects information from **Immovlan**, gathers data from more than 10,000 properties across Belgium, computes additional geographical features, and exports the final dataset in CSV format.
+The pipeline collects information from **Immovlan**, gathers data from around 10,000 properties across Belgium, computes additional geographical features, and exports the final dataset in CSV format.
 
 Main components:
 
@@ -48,41 +48,46 @@ Main components:
 │   ├── async_utils.py
 │   ├── geo_utils.py
 │   ├── property_details_scraper.py
-│   └── property_listings_scraper.py
+│   ├── property_listings_scraper.py
+│   └── utils.py
 │
-└── main.py
+├── emissions.py
+├── main.py
+├── .gitignore
+└── requirements.txt
+
 ```
 
 ---
 
-# Pipeline Overview
+## Pipeline Overview
 
 The pipeline is executed through `main.py`:
 
 ```
-Scrape property listings
+Scrape property listings (async, all provinces)
           |
           v
-Extract property URLs
+Save listings to property_listings.csv
           |
           v
-Scrape property details asynchronously
+Reload listings CSV → extract property URLs
           |
           v
-Add geographical features
+Scrape property details for each URL (async)
           |
           v
-Merge datasets using property_id
+Join listings + details on property_id
           |
           v
-Export final dataset
+Export final dataset to scraped_properties.csv
 ```
 
 ---
 
-# Modules
+## Modules
 
-## main.py
+### main.py
 
 Entry point of the project.
 
@@ -101,7 +106,7 @@ python main.py
 
 ---
 
-## property_listings_scraper.py
+### property_listings_scraper.py
 
 Responsible for collecting property URLs and basic information from Immovlan.
 
@@ -116,7 +121,7 @@ Extracted information includes:
 
 ---
 
-## property_details_scraper.py
+### property_details_scraper.py
 
 Scrapes detailed information from individual property pages.
 
@@ -131,7 +136,7 @@ Collected data includes:
 
 ---
 
-## geo_utils.py
+### geo_utils.py
 
 Adds geographical features:
 
@@ -140,7 +145,7 @@ Adds geographical features:
 
 ---
 
-## async_utils.py
+### async_utils.py
 
 Handles concurrent scraping of multiple property pages.
 
@@ -148,7 +153,7 @@ It improves performance by scraping several pages simultaneously while limiting 
 
 ---
 
-# Data Output
+## Data Output
 
 The pipeline generates:
 
@@ -172,7 +177,7 @@ Final enriched dataset containing:
 
 ---
 
-# Development
+## Development
 
 The `dev/` folder contains exploratory notebooks used for:
 
@@ -182,32 +187,32 @@ The `dev/` folder contains exploratory notebooks used for:
 
 ---
 
-# Main libraries
+## Main libraries
 
-* requests
-* beautifulsoup4
-* polars
 * asyncio
+* codecarbon
+* beautifulsoup4
+* httpx
+* lxml
+* polars
 
 ---
 
-# Running the project
-
 ## How to run the project
 
-Install dependencies:
+1. Install dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Run the application:
+2. Run the application:
 
 ```bash
 python main.py
 ```
 
-The final dataset is generated at:
+3. The final dataset is generated at:
 
 ```
 data/scraped_properties.csv
