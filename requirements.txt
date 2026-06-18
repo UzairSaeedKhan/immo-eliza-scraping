@@ -1,0 +1,7 @@
+beautifulsoup4
+lxml
+pandas
+httpx
+polars
+asyncio
+codecarbon
