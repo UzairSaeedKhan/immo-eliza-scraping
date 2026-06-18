@@ -1,5 +1,6 @@
 from src.property_listings_scraper import scrape_all_provinces
 from src.utils import save_to_csv, join_two_dfs_by_property_id
+from src.geo_utils import analyze_geo #ADDITION
 from src.property_details_scraper import parse_features
 from src.async_utils import scrape_all
 import asyncio

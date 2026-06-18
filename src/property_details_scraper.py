@@ -1,7 +1,7 @@
 import re
 from bs4 import BeautifulSoup
 import json
-
+from src.geo_utils import analyze_geo
 
 def value_after_h4(label,soup):
     """
@@ -145,12 +145,13 @@ def get_distance(category, mode,soup):
     
     
 def get_latitude(soup):
-    """
-    Extract latitude value from embedded JSON scripts in the HTML.
+    #"""
+    #Extract latitude value from embedded JSON scripts in the HTML.
 
-    Returns:
-        float latitude if found, otherwise None
-    """
+    #Returns:
+    #    float latitude if found, otherwise None
+    #"""
+
     for script in soup.find_all("script"):
         try:
             data = json.loads(script.string)
@@ -175,7 +176,7 @@ def get_longitude(soup):
         except:
             continue
     return None
-    
+
     
 def parse_features(html):
     """
@@ -209,6 +210,12 @@ def parse_features(html):
     #Property ID
     property_id = soup.find("span", class_ = "vlancode").get_text(strip=True)
     
+    #Geography
+    #lat = get_latitude(soup)
+    #lon = get_longitude(soup)
+    #postal_code = None #TO REMOVE!
+    #geo_info = analyze_geo(lat, lon, postal_code)
+
     tags = {
         "property_id": property_id,
         "price_in_€" : price,
@@ -222,7 +229,8 @@ def parse_features(html):
         "epc_score" : epc,
         
         "latitude" : get_latitude(soup),
-        "longitude" : get_longitude(soup), 
+        "longitude" : get_longitude(soup),
+        #**geo_info, 
         
         "furnished" : binary_element("Furnished",soup),    
         "nb_of_facades" : value_after_h4("Number of facades",soup),
