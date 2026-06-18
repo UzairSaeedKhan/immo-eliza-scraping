@@ -8,6 +8,16 @@ from codecarbon import track_emissions
 
 @track_emissions(output_dir="./data")
 def main():
+    """
+    Pipeline:
+    Scrape property listings (async, all provinces)
+    Save listings to property_listings.csv
+    Reload listings CSV and extract property URLs
+    Scrape property details for each URL (async)
+    Join listings + details on property_id
+    Export final dataset to scraped_properties.csv
+    """ 
+
     property_listings_df = asyncio.run(scrape_all_provinces())
     save_to_csv(property_listings_df, "./data/property_listings.csv")
 
