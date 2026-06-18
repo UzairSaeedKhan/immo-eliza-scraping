@@ -58,7 +58,7 @@ def get_property_info(section_title, field_name,soup):
 
 #converts "Yes" in 1 and "No" in 0 (None if no infos) 
 def binary_element(label,soup):    
-    value = value_after_h4(label)
+    value = value_after_h4(label,soup)
     #infos in h4 blocks
     if value:
         value = value.lower().strip()
@@ -187,7 +187,8 @@ def parse_features(html):
         "distance_from_train_stations_by_car_in_m": get_train_distance("Driving",soup)
     }
     return tags
-    
+
+
 
     # for key, value in Tags.items():
     #     print(f"- {key}: {value if value is not None else 'No information on Immovlan website'}, {type(value)}")

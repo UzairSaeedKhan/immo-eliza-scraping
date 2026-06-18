@@ -5,8 +5,8 @@ from src.async_utils import scrape_all
 import asyncio
 import polars as pl
 
-property_listings_df = asyncio.run(scrape_all_provinces())
-save_to_csv(property_listings_df, "./data/property_listings.csv")
+#property_listings_df = asyncio.run(scrape_all_provinces())
+#save_to_csv(property_listings_df, "./data/property_listings.csv")
 
 property_listings_df = pl.read_csv("./data/property_listings.csv")
 urls = property_listings_df["property_url"].to_list()[:10]
