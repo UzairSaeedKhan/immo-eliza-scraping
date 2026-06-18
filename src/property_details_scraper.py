@@ -266,8 +266,3 @@ def parse_features(html):
         "description" : get_description(soup)
     }
     return tags
-
-
-
-    # for key, value in Tags.items():
-    #     print(f"- {key}: {value if value is not None else 'No information on Immovlan website'}, {type(value)}")
